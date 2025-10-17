@@ -1,0 +1,58 @@
+name: "🚨 Hotfix"
+description: "Correções urgentes em produção ou em ambientes críticos"
+title: "🔥 [HOTFIX] - "
+labels: [ "hotfix", "urgent" ]
+body:
+- type: textarea
+  id: descricao
+  attributes:
+    label: 📝 Descrição
+    description: Descreva brevemente o problema crítico e o impacto.
+    placeholder: "Exemplo: Corrigir falha de autenticação em produção após atualização do JWT."
+  validations:
+    required: true
+
+- type: textarea
+  id: acao
+  attributes:
+    label: ⚙️ Ação Técnica
+    description: Explique o que será feito de forma direta e objetiva.
+    placeholder: "Exemplo: Reverter validação incorreta do payload e ajustar geração de token JWT."
+  validations:
+    required: true
+
+- type: checkboxes
+  id: criterios
+  attributes:
+    label: ⚡ Critérios de Aceite
+    options:
+    - label: Correção aplicada e validada em ambiente crítico
+    - label: Teste rápido de validação funcional (manual e/ou automatizado)
+    - label: Nenhum fluxo principal quebrado
+    - label: Código revisado com **Ruff Linter** (`ruff check .`)
+    - label: Código formatado com **Ruff Format** (`ruff format .`)
+    - label: "**Pre-commit** executado antes do merge"
+    - label: Código limpo, conciso e sem soluções paliativas
+
+- type: checkboxes
+  id: pos_deploy
+  attributes:
+    label: 🔎 Pós-Deploy
+    options:
+    - label: Verificar logs de erro e métricas
+    - label: Validar fluxo de autenticação e endpoints críticos
+    - label: Garantir rollback disponível se necessário
+
+- type: markdown
+  attributes:
+    value: |
+      ## 🗓️ Prioridade
+      **🚨 URGENTE** - Correção crítica com prioridade máxima
+
+- type: input
+  id: estimativa
+  attributes:
+    label: ⏱️ Estimativa
+    description: Tempo estimado para aplicar o hotfix.
+    placeholder: "Exemplo: Imediata / 1 hora"
+    value: "Imediata"

@@ -1,0 +1,80 @@
+name: "🚀 Feature"
+description: "Registrar nova funcionalidade ou melhoria técnica"
+title: "🧩 [FEAT] - "
+labels: [ "feature" ]
+body:
+- type: textarea
+  id: descricao
+  attributes:
+    label: 📝 Descrição
+    description: Resumo técnico da feature.
+    placeholder: "Exemplo: Implementar endpoint `/otp/validate` para validação de código OTP."
+  validations:
+    required: true
+
+- type: textarea
+  id: tarefa
+  attributes:
+    label: ⚙️ Tarefa / Descrição Técnica
+    description: Explique o que será feito de forma breve e objetiva.
+    placeholder: "Exemplo: Criar rota POST `/otp/validate`, validar código com PyOTP, e retornar novo token JWT."
+  validations:
+    required: true
+
+- type: checkboxes
+  id: criterios
+  attributes:
+    label: ✅ Critérios de Aceite
+    options:
+    - label: Funcionalidade testada e validada
+    - label: Retrocompatibilidade garantida (nada anterior quebrado)
+    - label: Documentação atualizada (README, Swagger, Wiki, etc.)
+    - label: Código revisado com **Ruff Linter** (`ruff check .`)
+    - label: Código formatado com **Ruff Format** (`ruff format .`)
+    - label: "**Pre-commit** configurado e executando lint/format antes dos commits"
+    - label: Código limpo e legível
+
+- type: textarea
+  id: dependencias
+  attributes:
+    label: 🔗 Dependências
+    description: Liste dependências de outras issues ou tarefas.
+    placeholder: "Exemplo: depende da issue #45 (endpoint `/otp/create`)"
+
+- type: textarea
+  id: stack
+  attributes:
+    label: 🧰 Stack / Alterações Técnicas
+    description: Descreva pacotes, bibliotecas ou mudanças técnicas necessárias.
+    placeholder: |
+      Exemplo:
+      - Adicionado pacote `pyotp`
+      - Atualizado SQLAlchemy para versão 2.x
+
+- type: checkboxes
+  id: testes
+  attributes:
+    label: 🧪 Testes
+    options:
+    - label: Casos de sucesso e falha validados
+    - label: Logs e erros tratados corretamente
+    - label: Garantia de não quebrar código existente
+
+- type: dropdown
+  id: prioridade
+  attributes:
+    label: 🗓️ Prioridade
+    description: Defina a prioridade desta feature.
+    options:
+    - 🔥 Alta
+    - ⚙️ Média
+    - 🧊 Baixa
+  validations:
+    required: true
+
+- type: input
+  id: estimativa
+  attributes:
+    label: ⏱️ Estimativa
+    description: Tempo estimado ou story points.
+    placeholder: "Exemplo: 3 dias ou 5 story points"

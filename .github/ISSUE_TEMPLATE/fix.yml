@@ -1,0 +1,63 @@
+name: "🐞 Bug Fix"
+description: "Correção de comportamento inesperado ou erro identificado"
+title: "🩹 [FIX] - "
+labels: [ "bug", "fix" ]
+body:
+- type: textarea
+  id: descricao
+  attributes:
+    label: 📝 Descrição
+    description: Resumo do problema a ser corrigido.
+    placeholder: "Exemplo: Corrigir erro de validação no endpoint `/otp/validate` que retorna 500 em vez de 400."
+  validations:
+    required: true
+
+- type: textarea
+  id: causa
+  attributes:
+    label: ⚙️ Causa / Descrição Técnica
+    description: Explique brevemente o motivo do bug e a abordagem da correção.
+    placeholder: "Exemplo: Falta de validação no campo `pin` antes da query ao banco."
+  validations:
+    required: true
+
+- type: checkboxes
+  id: criterios
+  attributes:
+    label: ✅ Critérios de Aceite
+    options:
+    - label: Bug reproduzido e validado como corrigido
+    - label: Testes adicionados ou ajustados para o caso corrigido
+    - label: Retrocompatibilidade garantida
+    - label: Código revisado com **Ruff Linter** (`ruff check .`)
+    - label: Código formatado com **Ruff Format** (`ruff format .`)
+    - label: "**Pre-commit** configurado e executado"
+    - label: Código limpo, direto e sem gambiarras
+
+- type: checkboxes
+  id: testes
+  attributes:
+    label: 🧪 Testes
+    options:
+    - label: Teste de regressão criado
+    - label: Caso de erro reproduzido e validado
+    - label: Logs e mensagens corretas
+
+- type: dropdown
+  id: prioridade
+  attributes:
+    label: 🗓️ Prioridade
+    description: Defina a prioridade deste fix.
+    options:
+    - 🔥 Alta
+    - ⚙️ Média
+    - 🧊 Baixa
+  validations:
+    required: true
+
+- type: input
+  id: estimativa
+  attributes:
+    label: ⏱️ Estimativa
+    description: Tempo estimado ou story points.
+    placeholder: "Exemplo: 2 dias ou 3 story points"

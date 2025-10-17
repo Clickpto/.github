@@ -1,0 +1,58 @@
+name: "🧠 Refactor"
+description: "Melhorias estruturais no código sem alterar comportamento funcional"
+title: "🛠️ [REFACTOR] - "
+labels: ["refactor", "maintenance"]
+body:
+  - type: textarea
+    id: descricao
+    attributes:
+      label: 📝 Descrição
+      description: Resuma brevemente o objetivo da refatoração.
+      placeholder: "Exemplo: Refatorar módulo UserController para reduzir duplicação de código e melhorar legibilidade."
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivo
+    attributes:
+      label: 🎯 Motivo da Refatoração
+      description: Explique o porquê dessa refatoração (técnico ou estratégico).
+      placeholder: "Exemplo: Código com alta duplicação e baixa manutenibilidade. Funções grandes e difíceis de testar."
+    validations:
+      required: true
+
+  - type: textarea
+    id: escopo
+    attributes:
+      label: ⚙️ Escopo / Descrição Técnica
+      description: Detalhe o que será alterado e o que **não deve mudar**.
+      placeholder: "Exemplo: Extrair função auxiliar para login; manter mesmos retornos da API."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: criterios
+    attributes:
+      label: ✅ Critérios de Aceite
+      options:
+        - label: Nenhuma mudança de comportamento funcional
+        - label: Refatoração melhora legibilidade e/ou manutenibilidade
+        - label: Testes existentes continuam passando
+        - label: Código revisado com **Ruff Linter** (`ruff check .`)
+        - label: Código formatado com **Ruff Format** (`ruff format .`)
+        - label: **Pre-commit** executado antes do commit
+        - label: Código limpo, claro e sem complexidade desnecessária
+
+  - type: textarea
+    id: testes
+    attributes:
+      label: 🧪 Testes
+      description: Liste o que foi validado após a refatoração.
+      placeholder: "Exemplo: Testes antigos passam sem alteração. Nenhum bug novo introduzido."
+  
+  - type: textarea
+    id: observacoes
+    attributes:
+      label: 🧾 Observações
+      description: Inclua anotações técnicas, riscos ou observações relevantes.
+      placeholder: "Exemplo: Refatoração estrutural sem impacto em endpoints nem regras de negócio."
