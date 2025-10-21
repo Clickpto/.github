@@ -40,7 +40,7 @@ body:
         - label: Testes existentes continuam passando
         - label: Código revisado com **Ruff Linter** (`ruff check .`)
         - label: Código formatado com **Ruff Format** (`ruff format .`)
-        - label: **Pre-commit** executado antes do commit
+        - label: Pre-commit executado antes do commit
         - label: Código limpo, claro e sem complexidade desnecessária
 
   - type: textarea
