@@ -8,7 +8,7 @@ body:
   attributes:
     label: 📝 Descrição Geral
     description: Descrição geral.
-    default: |
+    value: |
       1. VISÃO DO USUÁRIO
 
       COMO: XXX
