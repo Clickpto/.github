@@ -41,7 +41,6 @@ body:
 
 - type: markdown
   attributes:
-    label: ⌚ DOR/✅ DOD
     value: |
       ### ⌚ DOR
 
