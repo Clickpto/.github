@@ -1,7 +1,7 @@
-name: "🐞 Bug Fix"
-description: "Correção de comportamento inesperado ou erro identificado"
-title: "🩹 [FIX] - "
-labels: [ "bug" ]
+name: "🔬 Spike"
+description: "Pesquisa técnica exploratória para investigar e validar abordagens antes da implementação"
+title: "🔍 [SPIKE] - "
+labels: [ "spike" ]
 body:
 - type: textarea
   id: descricao

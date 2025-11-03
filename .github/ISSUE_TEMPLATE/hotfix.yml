@@ -1,7 +1,7 @@
 name: "🚨 Hotfix"
 description: "Correções urgentes em produção ou em ambientes críticos"
 title: "🔥 [HOTFIX] - "
-labels: [ "hotfix"]
+labels: [ "hotfix" ]
 body:
 - type: textarea
   id: descricao
@@ -97,8 +97,8 @@ body:
       | M           | H       | 13           |
       | H           | H       | 21           |
 
-        - L = low
-        - M = medium
-        - H = high
+        - L = Low
+        - M = Medium
+        - H = High
 
         **NOTA:** Acima de 21 pontos, considerar dividir em subtarefas.
