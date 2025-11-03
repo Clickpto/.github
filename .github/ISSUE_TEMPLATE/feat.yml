@@ -8,7 +8,7 @@ body:
   attributes:
     label: 📝 Descrição Geral
     description: Descrição geral.
-    placeholder: |
+    value: |
       1. VISÃO DO USUÁRIO
 
       COMO: XXX
@@ -101,4 +101,4 @@ body:
         - M = Medium
         - H = High
 
-        **NOTA:** Acima de 21 pontos, considerar dividir em subtarefas.
+        **NOTA:** A partir de 21 pontos, dividir em outras tarefas.
