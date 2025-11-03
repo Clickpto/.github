@@ -6,36 +6,26 @@ body:
 - type: textarea
   id: descricao
   attributes:
-    label: 📝 Descrição
-    description: Explique brevemente a mudança ou manutenção realizada.
-    placeholder: "Exemplo: Corrigir typo em variável `sucess` → `success`."
+    label: 📝 Descrição Geral
+    description: Descrição geral.
   validations:
     required: true
 
 - type: textarea
   id: tarefa
   attributes:
-    label: ⚙️ Tarefa / Descrição Técnica
-    description: Descreva o que foi modificado e por quê, deixando claro que **não há impacto funcional**.
-    placeholder: "Exemplo: Renomear variável incorreta no módulo `user_controller.py` para padronização de código e legibilidade."
+    label: ⚙️ Descrição Técnica
+    description: Descrição técnica.
   validations:
-    required: true
+    required: false
 
-- type: checkboxes
-  id: criterios
+- type: markdown
   attributes:
-    label: ✅ Critérios de Aceite
-    options:
-    - label: Nenhuma alteração de comportamento do sistema
-    - label: Código revisado com **Ruff Linter** (`ruff check .`)
-    - label: Código formatado com **Ruff Format** (`ruff format .`)
-    - label: "**Pre-commit** configurado e executado"
-    - label: Código limpo, padronizado e legível
-    - label: Se houve rename/refactor, garantir que todos os imports e referências foram atualizados corretamente
-
-- type: textarea
-  id: observacoes
-  attributes:
-    label: 🧾 Observações
-    description: Inclua anotações técnicas ou observações relevantes.
-    placeholder: "Exemplo: Alteração puramente de padronização; sem mudança lógica ou de execução."
+    value: |
+      ### ✅ Critérios de Aceite
+      - Nenhuma alteração de comportamento do sistema
+      - Código revisado com **Ruff Linter** (`ruff check .`)
+      - Código formatado com **Ruff Format** (`ruff format .`)
+      - **Pre-commit** configurado e executado
+      - Código limpo, padronizado e legível
+      - Se houve rename/refactor, garantir que todos os imports e referências foram atualizados corretamente
