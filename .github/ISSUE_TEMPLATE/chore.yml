@@ -83,7 +83,6 @@ body:
 
 - type: markdown
   attributes:
-    label: 💯 Fibonacci Score Table
     value: |
       ### Fibonacci Score Table Complexity/Effort Conversion
 
