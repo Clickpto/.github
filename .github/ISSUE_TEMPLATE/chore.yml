@@ -8,24 +8,55 @@ body:
   attributes:
     label: 📝 Descrição Geral
     description: Descrição geral.
+    placeholder: |
+      1. VISÃO DO USUÁRIO
+
+      COMO: XXX
+      QUERO: XXX
+      PARA: XXX
+
+      [...]
+
+      2. ANEXOS QUE APOIEM O DESENVOLVIMENTO
+
+      XXX
+
+      3. REGRAS DE NEGÓCIO
+
+      XXX
+
+      4. DEPENDÊNCIAS E RISCOS
+
+      XXX
+
+      5. CRITÉRIO DE ACEITE
+
+      DADO: XXX
+      QUANDO: XXX
+      ENTÃO: XXX
+
+      [...]
   validations:
     required: true
-
-- type: textarea
-  id: tarefa
-  attributes:
-    label: ⚙️ Descrição Técnica
-    description: Descrição técnica.
-  validations:
-    required: false
 
 - type: markdown
   attributes:
     value: |
-      ### ✅ Critérios de Aceite
-      - Nenhuma alteração de comportamento do sistema
-      - Código revisado com **Ruff Linter** (`ruff check .`)
-      - Código formatado com **Ruff Format** (`ruff format .`)
-      - **Pre-commit** configurado e executado
-      - Código limpo, padronizado e legível
-      - Se houve rename/refactor, garantir que todos os imports e referências foram atualizados corretamente
+      ### ⌚ DOR
+
+      - História criada utilizando o template de escrita.
+      - História refinada, quebrada nas subtarefas.
+      - História alinhada com o time/interessados.
+      - Mapeamento das APIs, serviços e definições arquiteturais impactadas pela história e procedimentos de publicação.
+      - Ambientes configurados e acessos necessários disponibilizados.
+      - Ausência de dependências com outras Histórias inacabadas.
+      - Legislação e conformidade verificadas, se aplicável.
+
+      ### ✅ DOD
+
+      - Atendimento e evidências de todos os critérios de aceite.
+      - Testes unitários desenvolvidos e executados.
+      - Deploy em PRD.
+      - Code review realizado.
+      - Testes prontos.
+      - Documentação atualizada.
