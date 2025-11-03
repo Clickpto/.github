@@ -85,7 +85,7 @@ body:
     value: |
       ### Fibonacci Score Table Complexity/Effort Conversion
 
-      | COMPLEXITY  | EFFORT  | PUNCTUATION  |
+      | . COMPLEXITY . | . EFFORT . | . PUNCTUATION . |
       | --- | --- | --- |
       | L | L | 1 |
       | M | L | 3 |
