@@ -1,58 +1,104 @@
 name: "🧠 Refactor"
 description: "Melhorias estruturais no código sem alterar comportamento funcional"
 title: "🛠️ [REFACTOR] - "
-labels: ["refactor", "maintenance"]
+labels: [ "refactor" ]
 body:
-  - type: textarea
-    id: descricao
-    attributes:
-      label: 📝 Descrição
-      description: Resuma brevemente o objetivo da refatoração.
-      placeholder: "Exemplo: Refatorar módulo UserController para reduzir duplicação de código e melhorar legibilidade."
-    validations:
-      required: true
+- type: textarea
+  id: descricao
+  attributes:
+    label: 📝 Descrição Geral
+    description: Descrição geral.
+    placeholder: |
+      1. VISÃO DO USUÁRIO
 
-  - type: textarea
-    id: motivo
-    attributes:
-      label: 🎯 Motivo da Refatoração
-      description: Explique o porquê dessa refatoração (técnico ou estratégico).
-      placeholder: "Exemplo: Código com alta duplicação e baixa manutenibilidade. Funções grandes e difíceis de testar."
-    validations:
-      required: true
+      COMO: XXX
+      QUERO: XXX
+      PARA: XXX
 
-  - type: textarea
-    id: escopo
-    attributes:
-      label: ⚙️ Escopo / Descrição Técnica
-      description: Detalhe o que será alterado e o que **não deve mudar**.
-      placeholder: "Exemplo: Extrair função auxiliar para login; manter mesmos retornos da API."
-    validations:
-      required: true
+      [...]
 
-  - type: checkboxes
-    id: criterios
-    attributes:
-      label: ✅ Critérios de Aceite
-      options:
-        - label: Nenhuma mudança de comportamento funcional
-        - label: Refatoração melhora legibilidade e/ou manutenibilidade
-        - label: Testes existentes continuam passando
-        - label: Código revisado com **Ruff Linter** (`ruff check .`)
-        - label: Código formatado com **Ruff Format** (`ruff format .`)
-        - label: Pre-commit executado antes do commit
-        - label: Código limpo, claro e sem complexidade desnecessária
+      2. ANEXOS QUE APOIEM O DESENVOLVIMENTO
 
-  - type: textarea
-    id: testes
-    attributes:
-      label: 🧪 Testes
-      description: Liste o que foi validado após a refatoração.
-      placeholder: "Exemplo: Testes antigos passam sem alteração. Nenhum bug novo introduzido."
-  
-  - type: textarea
-    id: observacoes
-    attributes:
-      label: 🧾 Observações
-      description: Inclua anotações técnicas, riscos ou observações relevantes.
-      placeholder: "Exemplo: Refatoração estrutural sem impacto em endpoints nem regras de negócio."
+      XXX
+
+      3. REGRAS DE NEGÓCIO
+
+      XXX
+
+      4. DEPENDÊNCIAS E RISCOS
+
+      XXX
+
+      5. CRITÉRIO DE ACEITE
+
+      DADO: XXX
+      QUANDO: XXX
+      ENTÃO: XXX
+
+      [...]
+  validations:
+    required: true
+
+- type: markdown
+  attributes:
+    value: |
+      ### ⌚ DOR
+
+      - História criada utilizando o template de escrita.
+      - História refinada, quebrada nas subtarefas.
+      - História alinhada com o time/interessados.
+      - Mapeamento das APIs, serviços e definições arquiteturais impactadas pela história e procedimentos de publicação.
+      - Ambientes configurados e acessos necessários disponibilizados.
+      - Ausência de dependências com outras Histórias inacabadas.
+      - Legislação e conformidade verificadas, se aplicável.
+
+      ### ✅ DOD
+
+      - Atendimento e evidências de todos os critérios de aceite.
+      - Testes unitários desenvolvidos e executados.
+      - Deploy em PRD.
+      - Code review realizado.
+      - Testes prontos.
+      - Documentação atualizada.
+
+- type: dropdown
+  id: prioridade
+  attributes:
+    label: 🗓️ Prioridade
+    description: Defina a prioridade.
+    options:
+    - 🧊 Baixa
+    - ⚙️ Média
+    - 🔥 Alta
+  validations:
+    required: true
+
+- type: input
+  id: estimativa
+  attributes:
+    label: ⏱️ Story points
+    description: Story points.
+    placeholder: "1, 3, 5, 8, 13 ou 21"
+
+- type: markdown
+  attributes:
+    value: |
+      ### Fibonacci Score Table Complexity/Effort Conversion
+
+      | COMPLEXITY  | EFFORT  | PUNCTUATION  |
+      | ----------- | ------- | ------------ |
+      | L           | L       | 1            |
+      | M           | L       | 3            |
+      | H           | L       | 5            |
+      | L           | M       | 3            |
+      | M           | M       | 8            |
+      | H           | M       | 13           |
+      | L           | H       | 5            |
+      | M           | H       | 13           |
+      | H           | H       | 21           |
+
+        - L = low
+        - M = medium
+        - H = high
+
+        **NOTA:** Acima de 21 pontos, considerar dividir em subtarefas.
