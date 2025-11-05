@@ -2,103 +2,83 @@ name: "🚀 Feature"
 description: "Registrar nova funcionalidade ou melhoria técnica"
 title: "🧩 [FEAT] - "
 labels: [ "feature" ]
+
+# 🚩 Opcional: já coloca a issue no Project
+projects:
+  - clickpto/Kanban   # OU org/SeuProject (ajuste ao seu caso)
+
 body:
-- type: textarea
-  id: descricao
-  attributes:
-    label: 📝 Descrição Geral
-    description: Descrição geral.
-    value: |
-      1. VISÃO DO USUÁRIO
+  - type: dropdown
+    id: status
+    attributes:
+      label: 🧭 Status
+      options:
+        - To Do
+        - Doing
+        - Review
+        - Blocked
+        - Done
+    validations:
+      required: true
 
-      COMO: XXX
-      QUERO: XXX
-      PARA: XXX
+  - type: dropdown
+    id: prioridade
+    attributes:
+      label: 🗓️ Priority
+      options:
+        - 🧊 Baixa
+        - ⚙️ Média
+        - 🔥 Alta
+    validations:
+      required: true
 
-      [...]
+  - type: input
+    id: story_points
+    attributes:
+      label: ⏱️ Story Points
+      description: Use sequência de Fibonacci (1, 3, 5, 8, 13, 21).
+      placeholder: "1, 3, 5, 8, 13 ou 21"
 
-      2. ANEXOS QUE APOIEM O DESENVOLVIMENTO
+  - type: dropdown
+    id: iteration
+    attributes:
+      label: 🌀 Iteration (Sprint)
+      description: "Nome igual ao do Project (ex.: Sprint 12)"
+      options:
+        - Sprint 11
+        - Sprint 12
+        - Sprint 13
 
-      XXX
+  - type: input
+    id: start_date
+    attributes:
+      label: 📅 Start date
+      description: "Formato YYYY-MM-DD (ex.: 2025-11-07)"
+      placeholder: "2025-11-07"
 
-      3. REGRAS DE NEGÓCIO
+  - type: input
+    id: end_date
+    attributes:
+      label: 📅 End date
+      description: "Formato YYYY-MM-DD (ex.: 2025-11-21)"
+      placeholder: "2025-11-21"
 
-      XXX
+  - type: input
+    id: release
+    attributes:
+      label: 🏷️ Release/Milestone
+      description: "Ex.: v1.4.0 ou Sprint-Release-2025-11"
+      placeholder: "v1.4.0"
 
-      4. DEPENDÊNCIAS E RISCOS
-
-      XXX
-
-      5. CRITÉRIO DE ACEITE
-
-      DADO: XXX
-      QUANDO: XXX
-      ENTÃO: XXX
-
-      [...]
-  validations:
-    required: true
-
-- type: markdown
-  attributes:
-    value: |
-      ### ⌚ DOR
-
-      - História criada utilizando o template de escrita.
-      - História refinada, quebrada nas subtarefas.
-      - História alinhada com o time/interessados.
-      - Mapeamento das APIs, serviços e definições arquiteturais impactadas pela história e procedimentos de publicação.
-      - Ambientes configurados e acessos necessários disponibilizados.
-      - Ausência de dependências com outras Histórias inacabadas.
-      - Legislação e conformidade verificadas, se aplicável.
-
-      ### ✅ DOD
-
-      - Atendimento e evidências de todos os critérios de aceite.
-      - Testes unitários desenvolvidos e executados.
-      - Deploy em PRD.
-      - Code review realizado.
-      - Testes prontos.
-      - Documentação atualizada.
-
-- type: dropdown
-  id: prioridade
-  attributes:
-    label: 🗓️ Prioridade
-    description: Defina a prioridade.
-    options:
-    - 🧊 Baixa
-    - ⚙️ Média
-    - 🔥 Alta
-  validations:
-    required: true
-
-- type: input
-  id: estimativa
-  attributes:
-    label: ⏱️ Story points
-    description: Story points.
-    placeholder: "1, 3, 5, 8, 13 ou 21"
-
-- type: markdown
-  attributes:
-    value: |
-      ### Fibonacci Score Table Complexity/Effort Conversion
-
-      | COMPLEXITY  | EFFORT  | PUNCTUATION  |
-      | ----------- | ------- | ------------ |
-      | L           | L       | 1            |
-      | M           | L       | 3            |
-      | H           | L       | 5            |
-      | L           | M       | 3            |
-      | M           | M       | 8            |
-      | H           | M       | 13           |
-      | L           | H       | 5            |
-      | M           | H       | 13           |
-      | H           | H       | 21           |
-
-        - L = Low
-        - M = Medium
-        - H = High
-
-        **NOTA:** A partir de 21 pontos, dividir em outras tarefas.
+  - type: textarea
+    id: descricao
+    attributes:
+      label: 📝 Descrição Geral
+      value: |
+        1. VISÃO DO USUÁRIO
+        COMO: ...
+        QUERO: ...
+        PARA: ...
+        [...]
+    validations:
+      required: true

@@ -1,0 +1,214 @@
+name: Sync Issue Form → Project fields
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  projects: write   # importante p/ Projects v2
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          PROJECT_NUMBER: "1"       # ⬅️ ajuste: número do seu Project (ex.: Kanban = 1)
+          OWNER_LOGIN: "Clickpto1"   # ⬅️ ajuste: organização ou owner
+          PROJECT_SCOPE: "org"      # "org" para projeto da organização; "repo" se for do repositório
+        with:
+          script: |
+            const body = context.payload.issue.body || "";
+
+            // 1) Extrair valores do Issue Form (case-insensitive, tolerante a emojis)
+            function pick(re, cast=(x)=>x) {
+              const m = body.match(re);
+              return m ? cast(m[1].trim()) : null;
+            }
+
+            const status     = pick(/(?<=^.*Status.*\\R\\R?)(.*)$/mi);
+            const priority   = pick(/(?<=^.*Priority.*\\R\\R?)(.*)$/mi);
+            const storyPts   = pick(/(?<=^.*Story\\s*Points.*\\R\\R?)(\\d+)/mi, Number);
+            const iteration  = pick(/(?<=^.*Iteration.*\\R\\R?)(.*)$/mi);
+            const startDate  = pick(/(?<=^.*Start\\s*date.*\\R\\R?)(\\d{4}-\\d{2}-\\d{2})/mi);
+            const endDate    = pick(/(?<=^.*End\\s*date.*\\R\\R?)(\\d{4}-\\d{2}-\\d{2})/mi);
+            const release    = pick(/(?<=^.*Release.*\\R\\R?)(.*)$/mi);
+
+            // 2) Obter Project + campos
+            const projectNumber = parseInt(process.env.PROJECT_NUMBER, 10);
+            const owner = process.env.OWNER_LOGIN;
+
+            let projectQuery, projectVars;
+            if (process.env.PROJECT_SCOPE === "org") {
+              projectQuery = `
+                query($owner: String!, $number: Int!) {
+                  organization(login: $owner) {
+                    projectV2(number: $number) {
+                      id
+                      fields(first: 50) {
+                        nodes {
+                          ... on ProjectV2FieldCommon { id name dataType }
+                          ... on ProjectV2SingleSelectField { id name options { id name } }
+                          ... on ProjectV2IterationField { id name configuration { iterations { id title } } }
+                        }
+                      }
+                    }
+                  }
+                }`;
+              projectVars = { owner, number: projectNumber };
+            } else {
+              projectQuery = `
+                query($owner: String!, $repo: String!, $number: Int!) {
+                  repository(owner: $owner, name: $repo) {
+                    projectV2(number: $number) {
+                      id
+                      fields(first: 50) {
+                        nodes {
+                          ... on ProjectV2FieldCommon { id name dataType }
+                          ... on ProjectV2SingleSelectField { id name options { id name } }
+                          ... on ProjectV2IterationField { id name configuration { iterations { id title } } }
+                        }
+                      }
+                    }
+                  }
+                }`;
+              projectVars = { owner, repo: context.repo.repo, number: projectNumber };
+            }
+
+            const projRes = await github.graphql(projectQuery, projectVars);
+            const project = process.env.PROJECT_SCOPE === "org"
+              ? projRes.organization.projectV2
+              : projRes.repository.projectV2;
+
+            const fields = project.fields.nodes;
+
+            // Helpers para pegar field por nome
+            const byName = (n) => fields.find(f => f.name.toLowerCase() === n.toLowerCase());
+            const fStatus    = byName("Status");
+            const fPriority  = byName("Priority");
+            const fStory     = byName("Story Points");
+            const fIteration = byName("Iteration");
+            const fStart     = byName("Start date");
+            const fEnd       = byName("End date");
+            const fRelease   = byName("Release");
+
+            // 3) Adicionar item ao Project, se necessário
+            const contentId = context.payload.issue.node_id;
+            const addRes = await github.graphql(`
+              mutation($projectId: ID!, $contentId: ID!) {
+                addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+                  item { id }
+                }
+              }`,
+              { projectId: project.id, contentId }
+            ).catch(() => null);
+
+            const itemId =
+              addRes?.addProjectV2ItemById?.item?.id
+              || (await (async () => {
+                   // Item já existe: procurar por item do issue (fallback opcional)
+                   // Em muitos casos não é necessário; mantido simples.
+                   return null;
+                 })());
+
+            if (!itemId) {
+              core.info("Item já deve estar no Project (ou não foi possível adicionar). Tentando atualizar mesmo assim…");
+            }
+
+            const targetItemId = itemId; // se precisar localizar existente, expandir aqui
+
+            // 4) Atualizar cada campo se houver valor
+            async function setSingleSelect(field, label) {
+              if (!field || !label) return;
+              const opt = field.options.find(o => o.name.toLowerCase() === label.toLowerCase());
+              if (!opt) return;
+              await github.graphql(`
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $opt: ID!) {
+                  updateProjectV2ItemFieldValue(input:{
+                    projectId: $projectId,
+                    itemId: $itemId,
+                    fieldId: $fieldId,
+                    value: { singleSelectOptionId: $opt }
+                  }) { projectV2Item { id } }
+                }`,
+                { projectId: project.id, itemId: targetItemId, fieldId: field.id, opt: opt.id }
+              );
+            }
+
+            async function setNumber(field, value) {
+              if (!field || value == null || value === "") return;
+              const num = Number(value);
+              if (Number.isNaN(num)) return;
+              await github.graphql(`
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $num: Float!) {
+                  updateProjectV2ItemFieldValue(input:{
+                    projectId: $projectId,
+                    itemId: $itemId,
+                    fieldId: $fieldId,
+                    value: { number: $num }
+                  }) { projectV2Item { id } }
+                }`,
+                { projectId: project.id, itemId: targetItemId, fieldId: field.id, num }
+              );
+            }
+
+            async function setDate(field, dateStr) {
+              if (!field || !dateStr) return;
+              await github.graphql(`
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $date: Date!) {
+                  updateProjectV2ItemFieldValue(input:{
+                    projectId: $projectId,
+                    itemId: $itemId,
+                    fieldId: $fieldId,
+                    value: { date: $date }
+                  }) { projectV2Item { id } }
+                }`,
+                { projectId: project.id, itemId: targetItemId, fieldId: field.id, date: dateStr }
+              );
+            }
+
+            async function setText(field, text) {
+              if (!field || !text) return;
+              await github.graphql(`
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $text: String!) {
+                  updateProjectV2ItemFieldValue(input:{
+                    projectId: $projectId,
+                    itemId: $itemId,
+                    fieldId: $fieldId,
+                    value: { text: $text }
+                  }) { projectV2Item { id } }
+                }`,
+                { projectId: project.id, itemId: targetItemId, fieldId: field.id, text }
+              );
+            }
+
+            async function setIteration(field, iterTitle) {
+              if (!field || !iterTitle) return;
+              const it = field.configuration.iterations.find(i => i.title.toLowerCase() === iterTitle.toLowerCase());
+              if (!it) return;
+              await github.graphql(`
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $iter: ID!) {
+                  updateProjectV2ItemFieldValue(input:{
+                    projectId: $projectId,
+                    itemId: $itemId,
+                    fieldId: $fieldId,
+                    value: { iterationId: $iter }
+                  }) { projectV2Item { id } }
+                }`,
+                { projectId: project.id, itemId: targetItemId, fieldId: field.id, iter: it.id }
+              );
+            }
+
+            await setSingleSelect(fStatus,   status);
+            await setSingleSelect(fPriority, priority);
+            await setNumber      (fStory,    storyPts);
+            await setIteration   (fIteration, iteration);
+            await setDate        (fStart,    startDate);
+            await setDate        (fEnd,      endDate);
+            await setText        (fRelease,  release);
+
+            // Sub-issues progress: não setável (é calculado)
+            return "OK";
