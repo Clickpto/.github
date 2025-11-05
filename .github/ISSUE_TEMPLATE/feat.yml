@@ -2,11 +2,8 @@ name: "🚀 Feature"
 description: "Registrar nova funcionalidade ou melhoria técnica"
 title: "🧩 [FEAT] - "
 labels: [ "feature" ]
-
-# 🚩 Opcional: já coloca a issue no Project
 projects:
-  - clickpto/Kanban   # OU org/SeuProject (ajuste ao seu caso)
-
+  - clickpto/Kanban
 body:
   - type: textarea
     id: descricao

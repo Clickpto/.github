@@ -8,7 +8,7 @@ permissions:
   contents: read
   issues: write
   pull-requests: write
-  projects: write   # importante p/ Projects v2
+  projects: write
 
 jobs:
   sync:
@@ -16,9 +16,9 @@ jobs:
     steps:
       - uses: actions/github-script@v7
         env:
-          PROJECT_NUMBER: "1"       # ⬅️ ajuste: número do seu Project (ex.: Kanban = 1)
-          OWNER_LOGIN: "Clickpto1"   # ⬅️ ajuste: organização ou owner
-          PROJECT_SCOPE: "org"      # "org" para projeto da organização; "repo" se for do repositório
+          PROJECT_NUMBER: "11"
+          OWNER_LOGIN: "Clickpto"
+          PROJECT_SCOPE: "org"
         with:
           script: |
             const body = context.payload.issue.body || "";
