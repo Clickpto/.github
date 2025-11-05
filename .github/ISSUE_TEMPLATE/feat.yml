@@ -8,6 +8,14 @@ projects:
   - clickpto/Kanban   # OU org/SeuProject (ajuste ao seu caso)
 
 body:
+  - type: textarea
+    id: descricao
+    attributes:
+      label: 📝 Descrição Geral
+      placeholder: Descrição Geral
+    validations:
+      required: true
+
   - type: dropdown
     id: status
     attributes:
@@ -69,16 +77,3 @@ body:
       label: 🏷️ Release/Milestone
       description: "Ex.: v1.4.0 ou Sprint-Release-2025-11"
       placeholder: "v1.4.0"
-
-  - type: textarea
-    id: descricao
-    attributes:
-      label: 📝 Descrição Geral
-      value: |
-        1. VISÃO DO USUÁRIO
-        COMO: ...
-        QUERO: ...
-        PARA: ...
-        [...]
-    validations:
-      required: true
