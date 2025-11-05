@@ -1,7 +1,7 @@
-name: "🚀 Feature"
-description: "Registrar nova funcionalidade ou melhoria técnica"
-title: "🧩 [FEAT] - "
-labels: [ "feature" ]
+name: "🐞 Bug Fix"
+description: "Correção de comportamento inesperado ou erro identificado"
+title: "🩹 [FIX] - "
+labels: [ "bug" ]
 body:
 - type: textarea
   id: descricao
@@ -64,7 +64,7 @@ body:
 - type: dropdown
   id: prioridade
   attributes:
-    label: 🗓️ Prioridade
+    label: 🗓️ Priority
     description: Defina a prioridade.
     options:
     - 🧊 Baixa

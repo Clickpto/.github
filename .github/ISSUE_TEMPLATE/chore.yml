@@ -1,7 +1,7 @@
-name: "🚨 Hotfix"
-description: "Correções urgentes em produção ou em ambientes críticos"
-title: "🔥 [HOTFIX] - "
-labels: [ "hotfix" ]
+name: "🧹 Chore"
+description: "Tarefas de manutenção e ajustes que não alteram comportamento do sistema"
+title: "🦆 [CHORE] - "
+labels: [ "chore" ]
 body:
 - type: textarea
   id: descricao
@@ -64,7 +64,7 @@ body:
 - type: dropdown
   id: prioridade
   attributes:
-    label: 🗓️ Prioridade
+    label: 🗓️ Priority
     description: Defina a prioridade.
     options:
     - 🧊 Baixa

@@ -1,7 +1,7 @@
-name: "🐞 Bug Fix"
-description: "Correção de comportamento inesperado ou erro identificado"
-title: "🩹 [FIX] - "
-labels: [ "bug" ]
+name: "🚨 Hotfix"
+description: "Correções urgentes em produção ou em ambientes críticos"
+title: "🔥 [HOTFIX] - "
+labels: [ "hotfix" ]
 body:
 - type: textarea
   id: descricao
@@ -64,7 +64,7 @@ body:
 - type: dropdown
   id: prioridade
   attributes:
-    label: 🗓️ Prioridade
+    label: 🗓️ Priority
     description: Defina a prioridade.
     options:
     - 🧊 Baixa

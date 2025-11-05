@@ -1,0 +1,84 @@
+name: "🚀 Feature"
+description: "Registrar nova funcionalidade ou melhoria técnica"
+title: "🧩 [FEAT] - "
+labels: [ "feature" ]
+
+# 🚩 Opcional: já coloca a issue no Project
+projects:
+  - clickpto/Kanban   # OU org/SeuProject (ajuste ao seu caso)
+
+body:
+  - type: dropdown
+    id: status
+    attributes:
+      label: 🧭 Status
+      options:
+        - To Do
+        - Doing
+        - Review
+        - Blocked
+        - Done
+    validations:
+      required: true
+
+  - type: dropdown
+    id: prioridade
+    attributes:
+      label: 🗓️ Priority
+      options:
+        - 🧊 Baixa
+        - ⚙️ Média
+        - 🔥 Alta
+    validations:
+      required: true
+
+  - type: input
+    id: story_points
+    attributes:
+      label: ⏱️ Story Points
+      description: Use sequência de Fibonacci (1, 3, 5, 8, 13, 21).
+      placeholder: "1, 3, 5, 8, 13 ou 21"
+
+  - type: dropdown
+    id: iteration
+    attributes:
+      label: 🌀 Iteration (Sprint)
+      description: "Nome igual ao do Project (ex.: Sprint 12)"
+      options:
+        - Sprint 11
+        - Sprint 12
+        - Sprint 13
+
+  - type: input
+    id: start_date
+    attributes:
+      label: 📅 Start date
+      description: "Formato YYYY-MM-DD (ex.: 2025-11-07)"
+      placeholder: "2025-11-07"
+
+  - type: input
+    id: end_date
+    attributes:
+      label: 📅 End date
+      description: "Formato YYYY-MM-DD (ex.: 2025-11-21)"
+      placeholder: "2025-11-21"
+
+  - type: input
+    id: release
+    attributes:
+      label: 🏷️ Release/Milestone
+      description: "Ex.: v1.4.0 ou Sprint-Release-2025-11"
+      placeholder: "v1.4.0"
+
+  - type: textarea
+    id: descricao
+    attributes:
+      label: 📝 Descrição Geral
+      value: |
+        1. VISÃO DO USUÁRIO
+        COMO: ...
+        QUERO: ...
+        PARA: ...
+        [...]
+    validations:
+      required: true

@@ -1,7 +1,7 @@
-name: "🔬 Spike"
-description: "Pesquisa técnica exploratória para investigar e validar abordagens antes da implementação"
-title: "🔍 [SPIKE] - "
-labels: [ "spike" ]
+name: "🧠 Refactor"
+description: "Melhorias estruturais no código sem alterar comportamento funcional"
+title: "🛠️ [REFACTOR] - "
+labels: [ "refactor" ]
 body:
 - type: textarea
   id: descricao
@@ -64,7 +64,7 @@ body:
 - type: dropdown
   id: prioridade
   attributes:
-    label: 🗓️ Prioridade
+    label: 🗓️ Priority
     description: Defina a prioridade.
     options:
     - 🧊 Baixa
