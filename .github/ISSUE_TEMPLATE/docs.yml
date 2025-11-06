@@ -1,7 +1,7 @@
-name: "🧹 Chore"
-description: "Tarefas de manutenção e ajustes que não alteram comportamento do sistema"
-title: "🦆 [CHORE] - "
-labels: [ "chore" ]
+name: "📚 Documentação"
+description: "Atualização ou criação de documentação técnica, guias e referências"
+title: "🖊️ [DOCS] - "
+labels: [ "docs" ]
 projects:
   - clickpto/Kanban
 body:
