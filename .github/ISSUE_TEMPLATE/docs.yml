@@ -21,6 +21,7 @@ body:
 
         O formulário "Kanban" estará disponível na própria tarefa após a criação desta.
 
+          - Assignee (Requerido ao iniciar a atividade)
           - Priority (Requerido)
           - Story Points (Requerido¹)
           - Iteration (Requerido ao liberar para Sprint)
