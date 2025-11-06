@@ -13,31 +13,78 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_NUMBER: "11"   # nº do Project da org
+      OWNER_LOGIN: "Clickpto"
+      PROJECT_SCOPE: "org"   # "org" (project da organização) | "repo" (project do repositório)
+      DEBUG: "true"         # mude para "true" para logs detalhados
     steps:
       - uses: actions/github-script@v7
-        env:
-          PROJECT_NUMBER: "11"
-          OWNER_LOGIN: "Clickpto"
-          PROJECT_SCOPE: "org"
         with:
           script: |
-            const body = context.payload.issue.body || "";
+            const core = require('@actions/core');
 
-            // 1) Extrair valores do Issue Form (case-insensitive, tolerante a emojis)
-            function pick(re, cast=(x)=>x) {
+            // ---- DEBUG flag (apenas via env.DEBUG) ----
+            const DEBUG = (process.env.DEBUG || "").toLowerCase() === "true";
+            function dlog(title, obj) {
+              if (!DEBUG) return;
+              try {
+                core.startGroup(String(title));
+                if (typeof obj === "string") core.info(obj);
+                else core.info(JSON.stringify(obj, null, 2));
+              } finally {
+                core.endGroup();
+              }
+            }
+
+            // ======= 1) Ler corpo da issue e extrair valores do form =======
+            const body = context.payload.issue.body || "";
+            dlog("DEBUG: Issue body (markdown)", body);
+
+            // Captura a primeira linha depois do rótulo (tolerante a emojis/markdown)
+            function pickBlock(labelPattern, cast = (x) => x) {
+              const re = new RegExp(`^\\s*.*\\b${labelPattern}\\b.*\\R+([^\\n\\r]+)`, "mi");
               const m = body.match(re);
               return m ? cast(m[1].trim()) : null;
             }
 
-            const status     = pick(/(?<=^.*Status.*\\R\\R?)(.*)$/mi);
-            const priority   = pick(/(?<=^.*Priority.*\\R\\R?)(.*)$/mi);
-            const storyPts   = pick(/(?<=^.*Story\\s*Points.*\\R\\R?)(\\d+)/mi, Number);
-            const iteration  = pick(/(?<=^.*Iteration.*\\R\\R?)(.*)$/mi);
-            const startDate  = pick(/(?<=^.*Start\\s*date.*\\R\\R?)(\\d{4}-\\d{2}-\\d{2})/mi);
-            const endDate    = pick(/(?<=^.*End\\s*date.*\\R\\R?)(\\d{4}-\\d{2}-\\d{2})/mi);
-            const release    = pick(/(?<=^.*Release.*\\R\\R?)(.*)$/mi);
+            const priority  = pickBlock("Priority");
+            const storyRaw  = pickBlock("Story\\s*Points");
+            const iteration = pickBlock("Iteration"); // vale para "Iteration (Sprint)" também
+            const startDate = pickBlock("Start\\s*date", s => (s.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? null));
+            const endDate   = pickBlock("End\\s*date",   s => (s.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? null));
+            const release   = pickBlock("Release");
 
-            // 2) Obter Project + campos
+            dlog("DEBUG: Valores extraídos", { priority, storyRaw, iteration, startDate, endDate, release });
+
+            // ======= 2) Validações =======
+            const validPriority = ["Critical", "High", "Medium", "Low"];
+            if (priority && !validPriority.includes(priority)) {
+              core.setFailed(`Priority inválida: "${priority}". Use: ${validPriority.join(", ")}.`);
+              return;
+            }
+
+            const storyPts = storyRaw != null ? Number(String(storyRaw).match(/\d+/)?.[0]) : null;
+            const validStoryPoints = [1, 3, 5, 8, 13];
+            if (storyPts != null && !validStoryPoints.includes(storyPts)) {
+              core.setFailed(`Story Points inválido: ${storyPts}. Use apenas 1, 3, 5, 8 ou 13.`);
+              return;
+            }
+
+            if (startDate && !/^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+              core.setFailed(`Start date inválida: "${startDate}". Use formato YYYY-MM-DD.`);
+              return;
+            }
+            if (endDate && !/^\d{4}-\d{2}-\d{2}$/.test(endDate)) {
+              core.setFailed(`End date inválida: "${endDate}". Use formato YYYY-MM-DD.`);
+              return;
+            }
+            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+              core.setFailed(`Start date (${startDate}) não pode ser maior que End date (${endDate}).`);
+              return;
+            }
+
+            // ======= 3) Obter Project + fields (GraphQL) =======
             const projectNumber = parseInt(process.env.PROJECT_NUMBER, 10);
             const owner = process.env.OWNER_LOGIN;
 
@@ -82,12 +129,14 @@ jobs:
             const project = process.env.PROJECT_SCOPE === "org"
               ? projRes.organization.projectV2
               : projRes.repository.projectV2;
+            if (!project) throw new Error("Project não encontrado. Verifique OWNER_LOGIN / PROJECT_NUMBER / PROJECT_SCOPE.");
 
-            const fields = project.fields.nodes;
+            const fields = project.fields.nodes || [];
+            dlog("DEBUG: Campos do Project (name/dataType)", fields.map(f => ({ name: f.name, dataType: f.dataType || "custom" })));
 
-            // Helpers para pegar field por nome
-            const byName = (n) => fields.find(f => f.name.toLowerCase() === n.toLowerCase());
-            const fStatus    = byName("Status");
+            const byName = (n) => fields.find(f => f.name?.toLowerCase() === n.toLowerCase());
+
+            // Mapear fields do Project (sem Status)
             const fPriority  = byName("Priority");
             const fStory     = byName("Story Points");
             const fIteration = byName("Iteration");
@@ -95,36 +144,61 @@ jobs:
             const fEnd       = byName("End date");
             const fRelease   = byName("Release");
 
-            // 3) Adicionar item ao Project, se necessário
+            dlog("DEBUG: IDs dos fields", {
+              Priority: fPriority?.id, StoryPoints: fStory?.id, Iteration: fIteration?.id,
+              StartDate: fStart?.id, EndDate: fEnd?.id, Release: fRelease?.id
+            });
+
+            // ======= 4) Garantir item no Project e obter itemId =======
             const contentId = context.payload.issue.node_id;
-            const addRes = await github.graphql(`
-              mutation($projectId: ID!, $contentId: ID!) {
-                addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
-                  item { id }
-                }
-              }`,
-              { projectId: project.id, contentId }
-            ).catch(() => null);
+            let itemId = null;
 
-            const itemId =
-              addRes?.addProjectV2ItemById?.item?.id
-              || (await (async () => {
-                   // Item já existe: procurar por item do issue (fallback opcional)
-                   // Em muitos casos não é necessário; mantido simples.
-                   return null;
-                 })());
-
-            if (!itemId) {
-              core.info("Item já deve estar no Project (ou não foi possível adicionar). Tentando atualizar mesmo assim…");
+            try {
+              const addRes = await github.graphql(`
+                mutation($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+                    item { id }
+                  }
+                }`,
+                { projectId: project.id, contentId }
+              );
+              itemId = addRes?.addProjectV2ItemById?.item?.id || null;
+              dlog("DEBUG: Resultado addProjectV2ItemById", addRes);
+            } catch (e) {
+              dlog("DEBUG: addProjectV2ItemById falhou (provável item já existente)", String(e));
             }
 
-            const targetItemId = itemId; // se precisar localizar existente, expandir aqui
+            if (!itemId) {
+              const findItemRes = await github.graphql(`
+                query($contentId: ID!) {
+                  node(id: $contentId) {
+                    ... on Issue {
+                      projectV2Items(first: 50) { nodes { id project { id title number } } }
+                    }
+                    ... on PullRequest {
+                      projectV2Items(first: 50) { nodes { id project { id title number } } }
+                    }
+                  }
+                }`,
+                { contentId }
+              );
+              const items = findItemRes?.node?.projectV2Items?.nodes || [];
+              itemId = items.find(n => n.project?.id === project.id)?.id || null;
+              dlog("DEBUG: projectV2Items da Issue", items);
+            }
+            if (!itemId) throw new Error("Não foi possível obter o itemId do Project para esta issue.");
+            dlog("DEBUG: itemId alvo", { itemId });
 
-            // 4) Atualizar cada campo se houver valor
+            // ======= 5) Helpers de atualização =======
             async function setSingleSelect(field, label) {
               if (!field || !label) return;
-              const opt = field.options.find(o => o.name.toLowerCase() === label.toLowerCase());
-              if (!opt) return;
+              const wanted = String(label).trim().toLowerCase();
+              const opt = field.options.find(o => o.name?.trim().toLowerCase() === wanted);
+              if (!opt) {
+                core.setFailed(`Opção "${label}" não encontrada no campo "${field.name}".`);
+                return;
+              }
+              dlog(`DEBUG: setSingleSelect ${field.name}`, { label, optionId: opt.id });
               await github.graphql(`
                 mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $opt: ID!) {
                   updateProjectV2ItemFieldValue(input:{
@@ -134,7 +208,7 @@ jobs:
                     value: { singleSelectOptionId: $opt }
                   }) { projectV2Item { id } }
                 }`,
-                { projectId: project.id, itemId: targetItemId, fieldId: field.id, opt: opt.id }
+                { projectId: project.id, itemId, fieldId: field.id, opt: opt.id }
               );
             }
 
@@ -142,6 +216,7 @@ jobs:
               if (!field || value == null || value === "") return;
               const num = Number(value);
               if (Number.isNaN(num)) return;
+              dlog(`DEBUG: setNumber ${field.name}`, { value: num });
               await github.graphql(`
                 mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $num: Float!) {
                   updateProjectV2ItemFieldValue(input:{
@@ -151,12 +226,13 @@ jobs:
                     value: { number: $num }
                   }) { projectV2Item { id } }
                 }`,
-                { projectId: project.id, itemId: targetItemId, fieldId: field.id, num }
+                { projectId: project.id, itemId, fieldId: field.id, num }
               );
             }
 
             async function setDate(field, dateStr) {
               if (!field || !dateStr) return;
+              dlog(`DEBUG: setDate ${field.name}`, { date: dateStr });
               await github.graphql(`
                 mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $date: Date!) {
                   updateProjectV2ItemFieldValue(input:{
@@ -166,12 +242,13 @@ jobs:
                     value: { date: $date }
                   }) { projectV2Item { id } }
                 }`,
-                { projectId: project.id, itemId: targetItemId, fieldId: field.id, date: dateStr }
+                { projectId: project.id, itemId, fieldId: field.id, date: dateStr }
               );
             }
 
             async function setText(field, text) {
               if (!field || !text) return;
+              dlog(`DEBUG: setText ${field.name}`, { text });
               await github.graphql(`
                 mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $text: String!) {
                   updateProjectV2ItemFieldValue(input:{
@@ -181,14 +258,19 @@ jobs:
                     value: { text: $text }
                   }) { projectV2Item { id } }
                 }`,
-                { projectId: project.id, itemId: targetItemId, fieldId: field.id, text }
+                { projectId: project.id, itemId, fieldId: field.id, text }
               );
             }
 
             async function setIteration(field, iterTitle) {
               if (!field || !iterTitle) return;
-              const it = field.configuration.iterations.find(i => i.title.toLowerCase() === iterTitle.toLowerCase());
-              if (!it) return;
+              const wanted = String(iterTitle).trim().toLowerCase();
+              const it = field.configuration.iterations.find(i => i.title?.trim().toLowerCase() === wanted);
+              if (!it) {
+                core.setFailed(`Iteração "${iterTitle}" não encontrada no campo "${field.name}". Verifique o título no Project.`);
+                return;
+              }
+              dlog(`DEBUG: setIteration ${field.name}`, { iterTitle, iterationId: it.id });
               await github.graphql(`
                 mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $iter: ID!) {
                   updateProjectV2ItemFieldValue(input:{
@@ -198,11 +280,11 @@ jobs:
                     value: { iterationId: $iter }
                   }) { projectV2Item { id } }
                 }`,
-                { projectId: project.id, itemId: targetItemId, fieldId: field.id, iter: it.id }
+                { projectId: project.id, itemId, fieldId: field.id, iter: it.id }
               );
             }
 
-            await setSingleSelect(fStatus,   status);
+            // ======= 6) Aplicar updates =======
             await setSingleSelect(fPriority, priority);
             await setNumber      (fStory,    storyPts);
             await setIteration   (fIteration, iteration);
@@ -210,5 +292,5 @@ jobs:
             await setDate        (fEnd,      endDate);
             await setText        (fRelease,  release);
 
-            // Sub-issues progress: não setável (é calculado)
+            core.info("✅ Sincronização concluída com sucesso!");
             return "OK";
