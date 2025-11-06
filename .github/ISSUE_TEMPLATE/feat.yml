@@ -21,12 +21,12 @@ body:
 
         O formulário "Kanban" estará disponível na própria tarefa após a criação desta.
 
-          Priority (❗ Requerido)
-          Story Points (❗ Requerido¹)
-          Iteration (❗ Requerido ao liberar para Sprint)
-          Start date (❗ Requerido ao iniciar a atividade)
-          End date (❗ Requerido ao finalizar a atividade)
-          Release (❗ Requerido se roadmap for definido¹)
+          - Priority (Requerido)
+          - Story Points (Requerido¹)
+          - Iteration (Requerido ao liberar para Sprint)
+          - Start date (Requerido ao iniciar a atividade)
+          - End date (Requerido ao finalizar a atividade)
+          - Release (Requerido se roadmap for definido¹)
 
           ¹ Para atividades de desenvolvimento.
 
