@@ -1,6 +1,6 @@
 name: "🚨 Hotfix"
 description: "Correções urgentes em produção ou em ambientes críticos"
-title: "🔥 [HOTFIX] - "
+title: "🔥 [HOTFIX] -"
 labels: [ "hotfix" ]
 projects:
   - clickpto/Kanban

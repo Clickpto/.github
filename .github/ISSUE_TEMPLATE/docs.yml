@@ -1,6 +1,6 @@
 name: "📚 Documentação"
 description: "Atualização ou criação de documentação técnica, guias e referências"
-title: "🖊️ [DOCS] - "
+title: "🖊️ [DOCS] -"
 labels: [ "docs" ]
 projects:
   - clickpto/Kanban

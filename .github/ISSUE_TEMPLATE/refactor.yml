@@ -1,6 +1,6 @@
 name: "🧠 Refactor"
 description: "Melhorias estruturais no código sem alterar comportamento funcional"
-title: "🛠️ [REFACTOR] - "
+title: "🛠️ [REFACTOR] -"
 labels: [ "refactor" ]
 projects:
   - clickpto/Kanban

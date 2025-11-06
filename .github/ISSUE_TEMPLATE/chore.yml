@@ -1,6 +1,6 @@
 name: "🧹 Chore"
 description: "Tarefas de manutenção e ajustes que não alteram comportamento do sistema"
-title: "🦆 [CHORE] - "
+title: "🦆 [CHORE] -"
 labels: [ "chore" ]
 projects:
   - clickpto/Kanban

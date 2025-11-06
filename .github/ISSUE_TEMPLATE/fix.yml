@@ -1,6 +1,6 @@
 name: "🐞 Bug Fix"
 description: "Correção de comportamento inesperado ou erro identificado"
-title: "🩹 [FIX] - "
+title: "🩹 [FIX] -"
 labels: [ "fix" ]
 projects:
   - clickpto/Kanban
