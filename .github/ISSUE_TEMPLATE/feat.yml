@@ -18,10 +18,10 @@ body:
     attributes:
       label: 🗓️ Priority
       options:
-        - Critical
-        - High
-        - Medium
         - Low
+        - Medium
+        - High
+        - Critical
     validations:
       required: true
 
