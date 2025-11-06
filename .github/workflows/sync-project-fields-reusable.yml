@@ -35,7 +35,6 @@ jobs:
       - uses: actions/github-script@v7
         with:
           script: |
-            const core = require('@actions/core'); // ⬅️ IMPORTANTE
             const DEBUG = (process.env.DEBUG || "").toLowerCase() === "true";
             function dlog(title, obj){ if(!DEBUG) return; try{ core.startGroup(String(title)); core.info(typeof obj==="string"?obj:JSON.stringify(obj,null,2)); } finally { core.endGroup(); } }
 
