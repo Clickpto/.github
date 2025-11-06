@@ -8,7 +8,6 @@ permissions:
   contents: read
   issues: write
   pull-requests: write
-  projects: write
 
 jobs:
   sync:
@@ -22,8 +21,6 @@ jobs:
       - uses: actions/github-script@v7
         with:
           script: |
-            const core = require('@actions/core');
-
             // ---- DEBUG flag (apenas via env.DEBUG) ----
             const DEBUG = (process.env.DEBUG || "").toLowerCase() === "true";
             function dlog(title, obj) {
@@ -41,18 +38,28 @@ jobs:
             const body = context.payload.issue.body || "";
             dlog("DEBUG: Issue body (markdown)", body);
 
-            // Captura a primeira linha depois do rótulo (tolerante a emojis/markdown)
+            // Captura o valor após o cabeçalho markdown
+            // Formato: ### [emojis/texto] Nome da Label [texto opcional]\n[linha vazia opcional]\nValor
+            // Exemplo: ###  🛡️ 💪🏻 saas 🌀     Alguma Coisa   (nada de importante $%$%)\n\nValor
             function pickBlock(labelPattern, cast = (x) => x) {
-              const re = new RegExp(`^\\s*.*\\b${labelPattern}\\b.*\\R+([^\\n\\r]+)`, "mi");
-              const m = body.match(re);
-              return m ? cast(m[1].trim()) : null;
+              // Escapa caracteres especiais do labelPattern, mas preserva espaços como \\s+ para flexibilidade
+              const escapedPattern = labelPattern.replace(/[.*+?^${}|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+              // Padrão: linha que começa com ###, qualquer coisa (não-newline) antes do nome da label, o nome da label, qualquer coisa (não-newline) depois
+              // Depois captura a primeira linha não vazia após essa linha (pulando linhas vazias opcionais)
+              const re = new RegExp(`^###\\s+[^\\n]*?${escapedPattern}[^\\n]*\\n+(?:[\\s\\n]*)([^\\n\\r]+)`, "gmi");
+              const m = re.exec(body);
+              if (m && m[1]) {
+                const value = m[1].trim();
+                return value ? cast(value) : null;
+              }
+              return null;
             }
 
             const priority  = pickBlock("Priority");
-            const storyRaw  = pickBlock("Story\\s*Points");
+            const storyRaw  = pickBlock("Story Points"); // GitHub usa "Story Points" no label
             const iteration = pickBlock("Iteration"); // vale para "Iteration (Sprint)" também
-            const startDate = pickBlock("Start\\s*date", s => (s.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? null));
-            const endDate   = pickBlock("End\\s*date",   s => (s.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? null));
+            const startDate = pickBlock("Start date", s => (s.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? null));
+            const endDate   = pickBlock("End date",   s => (s.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? null));
             const release   = pickBlock("Release");
 
             dlog("DEBUG: Valores extraídos", { priority, storyRaw, iteration, startDate, endDate, release });

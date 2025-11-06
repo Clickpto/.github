@@ -1,0 +1,41 @@
+# Secrets e tokens
+.secrets
+*.secrets
+secrets/
+*.token
+.env
+.env.local
+
+# Arquivos de configuração local do act
+.actrc
+actrc
+
+# Cache do act
+.act/
+
+# Arquivos temporários
+*.tmp
+*.log
+*.swp
+*.swo
+*~
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs e editores
+.vscode/
+.idea/
+*.sublime-*
+*.code-workspace
+
+# Arquivos de backup
+*.bak
+*.backup
+*~
+
+# Pasta de desenvolvimento local (pode ser movida para raiz)
+develop/
+
